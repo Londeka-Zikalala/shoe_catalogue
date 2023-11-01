@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"
+        rel="stylesheet">
+    <title>kicks by lubabalo admin</title>
+</head>
+<nav>
+    <a href="#add-shoe">Add A Shoe</a>
+    <a href="#remove-shoe">Remove A Shoe</a>
+    <div class="home"><a href="/index.html">Home</a></div>
+</nav>
+<section id="add-shoe" x-data="{ 
+    brand: '', 
+    size: '', 
+    color: '', 
+    price: '', 
+    inStock: '', 
+    imageURL: '', 
+    messages: { error: '', success: '' },
+    addNewShoe: function() {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/shoes', {
+            brand: this.brand,
+            size: this.size,
+            color: this.color,
+            price: this.price,
+            in_stock: this.inStock,
+            image_url: this.imageURL
+        })
+        .then(response => {
+            this.messages.success = 'Shoe added successfully';
+        })
+        .catch(error => {
+            this.messages.error = 'Error adding new shoe: ' + error.message;
+        });
+    }
+}">
+    <form @submit.prevent="addNewShoe">
+        <label for="brand">Brand:</label><br>
+        <input x-model="brand" type="text" id="brand" name="brand"><br>
+        <label for="size">Size:</label><br>
+        <input x-model="size" type="number" id="size" name="size"><br>
+        <label for="color">Color:</label><br>
+        <input x-model="color" type="text" id="color" name="color"><br>
+        <label for="price">Price:</label><br>
+        <input x-model="price" type="number" id="price" name="price"><br>
+        <label for="inStock">In Stock:</label><br>
+        <input x-model="inStock" type="number" id="inStock" name="inStock"><br>
+        <label for="imageURL">Image URL:</label><br>
+        <input x-model="imageURL" type="url" id="imageURL" name="imageURL"><br>
+        <button type="submit" class="addSubmit">Add Shoe</button>
+    </form>
+</section>
+
+
+<section id="remove-shoe" x-data="{ 
+    shoeId: '', 
+    messages: { error: '', success: '' },
+    removeShoe: function() {
+        axios.post(`https://lubabalos-shoe-shop.onrender.com/api/shoes/sold/${this.shoeId}`)
+            .then(response => {
+                this.messages.success = 'Shoe removed successfully';
+            })
+            .catch(error => {
+                this.messages.error = 'Error removing shoe: ' + error.message;
+            });
+    }
+}">
+  
+    <form @submit.prevent="removeShoe">
+        <label for="shoeId">Shoe ID:</label><br>
+        <input x-model="shoeId" type="number" id="shoeId" name="shoeId"><br>
+        <button type="submit" class="removeSubmit">Remove Shoe</button>
+    </form>
+</section>
+</html>

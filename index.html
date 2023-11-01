@@ -1,11 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"
+        rel="stylesheet">
+
     <title>kicks by lubabalo</title>
 </head>
-<body>
- 
+
+<body x-data="{ 
+    id:null, 
+    color:'',
+    brand: '', 
+    size: null, 
+    in_stock: '', 
+    price: null,
+    image_url:'',   
+    shoes: [], 
+        getAllShoes: function() {
+            axios.get('https://lubabalos-shoe-shop.onrender.com/api/shoes')
+                .then(response => {
+                    if (response.data.data) {
+                        this.shoes = response.data.data;
+                    } else {
+                        this.shoes = [];
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching shoes:', error);
+                    this.shoes = [];
+                });
+        },
+        getShoesByBrandAndSize: function() {
+            if (this.brand && this.size) {
+                axios.get(`https://lubabalos-shoe-shop.onrender.com/api/shoes/brand/${this.brand}/size/${this.size}`)
+                    .then(response => {
+                        if (response.data.data) {
+                            this.shoes = response.data.data;
+                        } else {
+                            this.shoes = [];
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching shoes by brand and size:', error);
+                        this.shoes = [];
+                    });
+            } else {
+                console.log('Please select both brand and size.');
+            }
+        }
+    }"
+     x-init="getAllShoes">
+
+    <nav>
+        <a href="#catalogue-selection">Pick By Size And Brand</a>
+        <div class="store-name">
+            <h1>Kicks By Lubabalo<span></span></h1>
+        </div>
+        <a href="#shoe-list">Available</a>
+        <div class="stock-page"> <a href="/admin.html">Stock Update</a></div>
+    </nav>
+    <div class="header">
+
+    </div>
+
+    <section id="catalogue-selection">
+        <div class="catalogue-selection">
+            <label for="chooseshoe">Pick A Shoe</label>
+            <select x-model="brand" id="brand" name="brand">
+                <option value="">Select A Brand</option>
+                <option value="Nike">Nike</option>
+                <option value="Adidas">Adidas</option>
+                <option value="Puma">Puma</option>
+                <option value="Reebok">Reebok</option>
+            </select>
+
+            <select x-model="size" id="size" name="size">
+                <option value="">Pick A Size</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+
+            <button @click="getShoesByBrandAndSize" class="sizeButton" type="submit">Show</button>
+
+        </div>
+    </section>
+    <section id="shoe-list">
+        <div class="shoe-list">
+            <template x-for="shoe in shoes" :key="shoe.id">
+                <ul>
+                    <div class="images">
+                        <img x-bind:src="shoe.image_url" alt="Shoe Image">
+                    </div>
+                    <div class="details">
+                        <li>Id: <span x-text="shoe.id"></span></li>
+                        <li>Brand: <span x-text="shoe.brand"></span></li>
+                        <li>Size: <span x-text="shoe.size"></span></li>
+                        <li>Color: <span x-text="shoe.color"></span></li>
+                        <li>Price: R<span x-text="shoe.price"></span></li>
+                        <li>In Stock: <span x-text="shoe.in_stock"></span></li>
+                    </div>
+                </ul>
+            </template>
+            <div x-show="shoes.length === 0">No shoes available.</div>
+        </div>
+    </section>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
 </body>
 </html>
