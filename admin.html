@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"rel="stylesheet">
     <title>kicks by lubabalo admin</title>
 </head>
 <nav>
@@ -42,6 +40,7 @@
         });
     }
 }">
+<div class="add-content">
     <form @submit.prevent="addNewShoe">
         <label for="brand">Brand:</label><br>
         <input x-model="brand" type="text" id="brand" name="brand"><br>
@@ -57,6 +56,7 @@
         <input x-model="imageURL" type="url" id="imageURL" name="imageURL"><br>
         <button type="submit" class="addSubmit">Add Shoe</button>
     </form>
+</div>
 </section>
 
 
@@ -73,11 +73,12 @@
             });
     }
 }">
-  
+  <div class="remove-content">
     <form @submit.prevent="removeShoe">
         <label for="shoeId">Shoe ID:</label><br>
         <input x-model="shoeId" type="number" id="shoeId" name="shoeId"><br>
         <button type="submit" class="removeSubmit">Remove Shoe</button>
     </form>
+</div>
 </section>
 </html>
