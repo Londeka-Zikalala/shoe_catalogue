@@ -76,21 +76,22 @@ ul{
 
 .shoe-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
-    gap: 2px; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 0;
 }
 
-
-.shoe-list ul{
-    display:flex;
+.shoe-list ul {
+    display: flex;
     flex-direction: column;
-    align-items:center;
-    list-style-type:none;
-    border:1px solid black;
-    padding:10px;
-    margin:10px;
+    align-items: center;
+    list-style-type: none;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px;
     background-color: rgb(247, 245, 245);
+    width: 100%;
 }
+
 
 .images{
     width:100%;
@@ -147,12 +148,12 @@ button {
   }
   
   
-  /*Flash Messages*/
+  /* Messages*/
   
-  .flash-success{
+  .success-message{
     color:rgb(0, 255, 0)
   }
 
-  .flash-error{
+  .error-message{
     color: rgb(255, 0, 0);
   }

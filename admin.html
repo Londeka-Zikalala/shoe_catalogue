@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"rel="stylesheet">
     <title>kicks by lubabalo admin</title>
 </head>
+<body>
 <nav>
     <a href="#add-shoe">Add A Shoe</a>
     <a href="#remove-shoe">Remove A Shoe</a>
@@ -22,7 +23,7 @@
     price: '', 
     inStock: '', 
     imageURL: '', 
-    messages: { error: '', success: '' },
+    messages: { addShoe: { error: '', success: '' }},
     addNewShoe: function() {
         axios.post('https://lubabalos-shoe-shop.onrender.com/api/shoes', {
             brand: this.brand,
@@ -33,13 +34,15 @@
             image_url: this.imageURL
         })
         .then(response => {
-            this.messages.success = 'Shoe added successfully';
+            this.messages.addShoe.success = 'Shoe added successfully';
+            this.addedShoeId = response.data.id;
         })
         .catch(error => {
-            this.messages.error = 'Error adding new shoe: ' + error.message;
+            this.messages.addShoe.error = 'Error adding new shoe: ' + error.message;
         });
     }
 }">
+
 <div class="add-content">
     <form @submit.prevent="addNewShoe">
         <label for="brand">Brand:</label><br>
@@ -56,29 +59,40 @@
         <input x-model="imageURL" type="url" id="imageURL" name="imageURL"><br>
         <button type="submit" class="addSubmit">Add Shoe</button>
     </form>
+    <div class="error-message" x-show="messages.addShoe.error"><h6>Error adding shoe Id:<span x-text="addedShoeId"></span> </h6></div>
+<div class="success-message" x-show="messages.addShoe.success"><h6>Shoe Id:<span x-text="addedShoeId"></span>, added successfully!</h6></div>
 </div>
+
 </section>
 
 
 <section id="remove-shoe" x-data="{ 
     shoeId: '', 
-    messages: { error: '', success: '' },
+    messages: { removeShoe: { error: '', success: '' }},
     removeShoe: function() {
         axios.post(`https://lubabalos-shoe-shop.onrender.com/api/shoes/sold/${this.shoeId}`)
             .then(response => {
-                this.messages.success = 'Shoe removed successfully';
+                this.messages.removeShoe.success = 'Shoe removed successfully';
             })
             .catch(error => {
-                this.messages.error = 'Error removing shoe: ' + error.message;
+                this.messages.removeShoe.error= 'Error removing shoe: ' + error.message;
             });
     }
 }">
+
   <div class="remove-content">
     <form @submit.prevent="removeShoe">
         <label for="shoeId">Shoe ID:</label><br>
         <input x-model="shoeId" type="number" id="shoeId" name="shoeId"><br>
         <button type="submit" class="removeSubmit">Remove Shoe</button>
     </form>
+ <div class="success-message" x-show="messages.removeShoe.success"><h6>Shoe Id: <span x-text="shoeId"></span>, removed successfully!</h6></div>
+
+<div class="error-message" x-show="messages.removeShoe.error"><h6>Error removing shoe</h6></div>
 </div>
+
 </section>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
+</body>
 </html>
