@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@700&family=Mali:ital,wght@0,200;0,400;0,500;0,600;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 /***global styling, nav-bar***/
 *{
   box-sizing:border-box;  
@@ -7,8 +8,12 @@
 
 
 body{
-    font-family:'Metal Mania';
+    font-family: 'Cardo', serif;
     background-color:rgb(224, 224, 224);
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Mali', cursive;
 }
 
 .container{
@@ -46,7 +51,7 @@ nav a:hover {
 
 /*admin.html*/
 
-.add-content, .remove-content{
+.add-content, .remove-content, .table-content{
     width:100%;
     height:100vh;
     display: flex;
@@ -55,8 +60,31 @@ nav a:hover {
     justify-content: center;
 }
 
+.stock-table table {
+    width: 100%;
+    table-layout: fixed; 
+}
+.stock-table img {
+    width: 50px; 
+    height: auto;
+}
+.red, .red-key{
+    background-color: red;
+}
+
+.orange, .orange-key{
+    background-color: orange;
+}
+
+.green, .green-key{
+    background-color: green;
+}
 .remove{
     margin-top: 2%;
+  }
+
+  .green-key, .red-key, .orange-key{
+            width: 10px;
   }
 
 /*index.html*/

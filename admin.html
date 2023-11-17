@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Peralta&family=Sedgwick+Ave+Display&display=swap"rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cardo:wght@700&family=Mali:ital,wght@0,200;0,400;0,500;0,600;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <title>kicks by lubabalo admin</title>
 </head>
 <body>
@@ -16,7 +19,74 @@
     <a href="#remove-shoe">Remove A Shoe</a>
     <div class="home"><a href="index.html">Home</a></div>
 </nav>
+
+<section id="see-stock" x-data="{ 
+    id: '',
+    brand: '', 
+    size: '', 
+    color: '', 
+    price: '', 
+    inStock: '', 
+    imageURL: '', 
+    shoes: [],  
+    messages: { seeStock: { error: '', success: '' }},
+    seeStock: function() {
+        axios.get('https://lubabalos-shoe-shop.onrender.com/api/admin/stock')
+            .then(response => {
+                this.shoes = response.data.data;
+            })
+            .catch(error => {
+                this.messages.seeStock.error = 'Error fetching shoes: ' + error.message;
+            });
+    }
+}" x-init ="seeStock">
+<h1>STOCK TABLE </h1>
+<div class="key">
+    <ul>
+        <li> <h6>Enough stock</h6> <div class="green-key"></div></li>
+        <li><h6>Might Need A Restock</h6> <div class="orange-key"></div></li>
+        <li><h6>Need A Restock</h6><div class="red-key"></div></li>
+    </ul>
+</div>
+<div class="table-content">
+    <div class="stock-table">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Image URL</th>
+                <th>Price</th>
+                <th>In Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            <template x-for="shoe in shoes" :key="shoe.id">
+                <tr :class="{
+                    'red': shoe.colorCode === 'red',
+                    'orange': shoe.colorCode === 'orange',
+                    'green': shoe.colorCode === 'green'
+                }">
+                    <td x-text="shoe.id"></td>
+                    <td x-text="shoe.brand"></td>
+                    <td x-text="shoe.color"></td>
+                    <td x-text="shoe.size"></td>
+                    <td><img :src="shoe.image_url" alt="Shoe"></td>
+                    <td x-text="shoe.price"></td>
+                    <td x-text="shoe.in_stock"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</div>
+</div>
+</section>
+
+
 <section id="add-shoe" x-data="{ 
+    id: '',
     brand: '', 
     size: '', 
     color: '', 
@@ -25,7 +95,7 @@
     imageURL: '', 
     messages: { addShoe: { error: '', success: '' }},
     addNewShoe: function() {
-        axios.post('https://lubabalos-shoe-shop.onrender.com/api/shoes', {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/admin', {
             brand: this.brand,
             size: this.size,
             color: this.color,
@@ -35,7 +105,7 @@
         })
         .then(response => {
             this.messages.addShoe.success = 'Shoe added successfully';
-            this.addedShoeId = response.data.id;
+          
         })
         .catch(error => {
             this.messages.addShoe.error = 'Error adding new shoe: ' + error.message;
@@ -59,18 +129,23 @@
         <input x-model="imageURL" type="url" id="imageURL" name="imageURL"><br>
         <button type="submit" class="addSubmit">Add Shoe</button>
     </form>
-    <div class="error-message" x-show="messages.addShoe.error"><h6>Error adding shoe Id:<span x-text="addedShoeId"></span> </h6></div>
-<div class="success-message" x-show="messages.addShoe.success"><h6>Shoe Id:<span x-text="addedShoeId"></span>, added successfully!</h6></div>
+    <div class="error-message" x-show="messages.addShoe.error"><h6>Error adding shoe Id:<span ></span> </h6></div>
+<div class="success-message" x-show="messages.addShoe.success"><h6>Shoe Id:<span></span>, added successfully!</h6></div>
 </div>
 
 </section>
 
 
 <section id="remove-shoe" x-data="{ 
-    shoeId: '', 
+    imageURL: '',
+    quantity: '',
     messages: { removeShoe: { error: '', success: '' }},
     removeShoe: function() {
-        axios.post(`https://lubabalos-shoe-shop.onrender.com/api/shoes/sold/${this.shoeId}`)
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/admin/sold', {
+            image_url: this.imageURL,
+            quantity: this.quantity
+
+        })
             .then(response => {
                 this.messages.removeShoe.success = 'Shoe removed successfully';
             })
@@ -82,16 +157,19 @@
 
   <div class="remove-content">
     <form @submit.prevent="removeShoe">
-        <label for="shoeId">Shoe ID:</label><br>
-        <input x-model="shoeId" type="number" id="shoeId" name="shoeId"><br>
+        <label for="quantity">Quantity:</label><br>
+        <input x-model="quantity" type="number" id="quantity" name="quantity"><br>
+        <label for="imageURL">Image URL:</label><br>
+        <input x-model="imageURL" type="url" id="imageURL" name="imageURL"><br>
         <button type="submit" class="removeSubmit">Remove Shoe</button>
     </form>
- <div class="success-message" x-show="messages.removeShoe.success"><h6>Shoe Id: <span x-text="shoeId"></span>, removed successfully!</h6></div>
+ <div class="success-message" x-show="messages.removeShoe.success"><h6>Shoe Id: <span x-text="imageURL"></span>, removed successfully!</h6></div>
 
 <div class="error-message" x-show="messages.removeShoe.error"><h6>Error removing shoe</h6></div>
 </div>
 
 </section>
+
 <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
 </body>
