@@ -6,8 +6,64 @@
     <title>User Cart</title>
 </head>
 <body x-data="{
+    user: { email: '' },  
+    cartItems: [],
+    totalPrice: 0,
+    messages: { checkout: { error: '', success: '' }},
     
-}">
-    
+    getCart: async function() {
+        try {
+            const response = await axios.get(`https://lubabalos-shoe-shop.onrender.com/api/users/cart/${this.user.email}`);
+            this.cartItems = JSON.parse(JSON.stringify(Object.assign({}, response.data.cartItems || [])));
+            this.totalPrice = response.data.totalPrice;
+            this.messages.checkout.success = 'Checkout Successful!';
+            console.log('API Response:', this.cartItems);
+        } catch (error) {
+            this.messages.checkout.error = 'Error checking out';
+            console.error('API Error:', error);
+        }
+    },
+    checkout: function() {
+        axios.post(`https://lubabalos-shoe-shop.onrender.com/api/checkout/${this.user.email}`)
+            .then(response => {
+                this.checkoutMessage = response.data.message;
+                console.log('Checkout successful:', this.checkoutMessage);
+            })
+            .catch(error => {
+                console.error('Error during checkout:', error);
+            });
+    }
+}" x-init="getCart">
+
+    <h1>Your Cart:</h1>
+
+    <div x-show="cartItems.length === 0">Your cart is empty.</div>
+
+    <template x-if="cartItems.length > 0">
+        <div class="cart">
+        <ul>
+            <li x-for="item in cartItems" :key="item.id">
+                <img :src="item.imgurl" alt="Shoe Image" width="50" height="50">
+                <span>Quantity: {{ item.quantity }}</span>
+                <span>Price: R{{ item.price }}</span>
+                <button @click="removeFromCart(item.id)">Remove</button>
+            </li>
+        </ul>
+        <div class="checkout">
+            <p>Total Price: R{{ totalPrice }}</p>
+            <button @click="checkout">Checkout</button>
+            <div class="error-message" x-show="messages.checkout.error">
+                <h6>Error adding shoe Id:<span></span></h6>
+            </div>
+            <div class="success-message" x-show="messages.checkout.success">
+                <h6>Shoe Id:<span></span>, added successfully!</h6>
+            </div>
+        </div>
+    </div>
+    </template>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
+
 </body>
 </html>

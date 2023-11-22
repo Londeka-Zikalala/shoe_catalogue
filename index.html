@@ -37,25 +37,30 @@
         password: '',
         balance: ''
     },
-        addToCart: function (){
-            if (!this.user) {
-                // If not logged in, show login modal
-                this.showLogin = true;
-            } else {
-            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/cart',{
-                email:this.email,
-                image_url:this.shoeId,
-                quantity:this.quantity,
+    addToCart: function ({...shoe}) {
+        if (!this.user) {
+            // If not logged in, show login modal
+            this.showLogin = true;
+        } else {
+            console.log('Adding to Cart:', shoe);
+    
+            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/cart', {
+                email: this.user.email,
+                image_url: shoe.image_url,
+                quantity: shoe.quantity,
             })
             .then(response => {
+                console.log('Add to Cart Response:', response.data);
+    
                 this.messages.addToCart.success = 'Shoe added to cart successfully';
-              
             })
             .catch(error => {
+                console.error('Error adding to cart:', error);
                 this.messages.addToCart.error = 'Error adding to cart: ' + error.message;
             });
         }
     },
+    
         loginUser: function () {
             axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/login', this.loginForm)
                 .then(response => {
@@ -140,7 +145,7 @@
                 <h1>Kicks By Lubabalo<span></span></h1>
             </div>
             <a href="#shoe-list">Available</a>
-            <div x-show="user && user.role === 'user'" class="cart-page"><a href="#cart">Cart</a></div>
+            <div x-show="user && user.role === 'user'" class="cart-page"><a href="usercart.html">Cart</a></div>
             <div x-show="user && user.role === 'admin'" class="stock-page"><a href="admin.html">Stock Update</a></div>
             <div x-show="!user">
                 <a href="#" @click="showLogin = true">Login</a>
@@ -191,7 +196,7 @@
                 <ul>
                     <div class="images">
                         <img x-bind:src="shoe.image_url" alt="Shoe Image">
-                        <button @click="addToCart()">Add to Cart</button>
+                        <button @click="addToCart({...shoe})">Add to Cart</button>
                         <label for="quantity">Quantity:</label>
                         <input type="number" id="quantity" name="quantity" x-model="shoe.quantity" min="1" max="10" />
                     </div>
@@ -234,7 +239,8 @@
         </div>
     </section>
     
-    <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
+
 </body>
 </html>
