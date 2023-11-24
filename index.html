@@ -22,7 +22,7 @@
     in_stock: '', 
     price: null,
     image_url:'', 
-    user: '',
+    user: JSON.parse(localStorage.getItem('user')) || '',
     cart: [],  
     shoes: [],
     showLogin: false,
@@ -37,74 +37,58 @@
         password: '',
         balance: ''
     },
-    addToCart: function ({...shoe}) {
-        if (!this.user) {
-            // If not logged in, show login modal
-            this.showLogin = true;
-        } else {
-            console.log('Adding to Cart:', shoe);
-    
-            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/cart', {
-                email: this.user.email,
-                image_url: shoe.image_url,
-                quantity: shoe.quantity,
-            })
+    messages: { addToCart: { error: '', success: '' }},
+    signupUser: function () {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users', this.signupForm)
             .then(response => {
-                console.log('Add to Cart Response:', response.data);
-    
-                this.messages.addToCart.success = 'Shoe added to cart successfully';
+                if (response.data.status === 'success') {
+                    this.user = {  email: this.signupForm.email };
+                    this.showSignup = false;
+                } else {
+                    alert(response.data.message);
+                }
             })
             .catch(error => {
-                console.error('Error adding to cart:', error);
-                this.messages.addToCart.error = 'Error adding to cart: ' + error.message;
+                console.error('Error signing up:', error);
+                alert('Error signing up. Please try again.');
             });
-        }
     },
-    
-        loginUser: function () {
-            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/login', this.loginForm)
-                .then(response => {
-                    if (response.data.status === 'success') {
-                        this.user = { role: 'user', email: this.loginForm.email };
-                        this.showLogin = false;
-                    } else {
-                        alert(response.data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error logging in:', error);
-                    alert('Error logging in. Please try again.');
-                });
-        },
-        signupUser: function () {
-            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users', this.signupForm)
-                .then(response => {
-                    if (response.data.status === 'success') {
-                        this.user = { role: 'user', email: this.signupForm.email };
-                        this.showSignup = false;
-                    } else {
-                        alert(response.data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error signing up:', error);
-                    alert('Error signing up. Please try again.');
-                });
-        },
-        logoutUser: function () {
-            axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout')
-                .then(response => {
-                    if (response.data.status === 'success') {
-                        this.user = null;
-                    } else {
-                        alert('Error logging out. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error logging out:', error);
+    loginUser: function () {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/login', this.loginForm)
+            .then(response => {
+                if (response.data.status === 'success') {
+                    this.user = { role: 'user', email: this.loginForm.email };
+
+                    // Store user information in local storage
+                    localStorage.setItem('user', JSON.stringify(this.user));
+
+                    this.showLogin = false;
+                } else {
+                    alert(response.data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error logging in:', error);
+                alert('Error logging in. Please try again.');
+            });
+    },
+       
+    logoutUser: function () {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout')
+            .then(response => {
+                if (response.data.status === 'success') {
+                    // Clear user information from local storage
+                    localStorage.removeItem('user');
+                    this.user = null;
+                } else {
                     alert('Error logging out. Please try again.');
-                });
-        },
+                }
+            })
+            .catch(error => {
+                console.error('Error logging out:', error);
+                alert('Error logging out. Please try again.');
+            });
+    },
         getAllShoes: function() {
             axios.get('https://lubabalos-shoe-shop.onrender.com/api/shoes')
                 .then(response => {
@@ -137,69 +121,135 @@
                 console.log('Please select both brand and size.');
             }
         },
+        addToCart: function (shoe) {
+            const storedUser = localStorage.getItem('user');
+            console.log(shoe)
+            console.log(storedUser)
+            if (!storedUser) {
+                // If not logged in, show login modal
+                this.showLogin = true;
+            } else {
+                this.user = JSON.parse(storedUser);
+                console.log('Adding to Cart:', shoe);
+
+                axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/cart', {
+                    email: this.user.email,
+                    image_url: shoe.image_url,
+                    quantity: shoe.quantity,
+                })
+                .then(response => {
+                    console.log(this.user)
+                    JSON.parse(JSON.stringify(Object.assign({}, response.data.shoe)))
+                    console.log('Add to Cart Response:', response.data);
+                    this.messages.addToCart.success = 'Shoe added to cart successfully';
+                    localStorage.setItem('user', JSON.stringify(this.user));
+                })
+                .catch(error => {
+                    console.error(error.message, error);
+                    this.messages.addToCart.error = response.data.message
+                });
+            }
+        },
+        
     }" x-init="getAllShoes">
 
         <nav>
-            <a href="#catalogue-selection">Pick By Size And Brand</a>
+            <div class="nav-contents">
+            <a href="#shoe-list">Available</a>
             <div class="store-name">
                 <h1>Kicks By Lubabalo<span></span></h1>
             </div>
-            <a href="#shoe-list">Available</a>
-            <div x-show="user && user.role === 'user'" class="cart-page"><a href="usercart.html">Cart</a></div>
+            
+            <div x-show="user && user.role === 'user'" class="cart-page"><a href="usercart.html"><img src="./images/shopping_bag_FILL0_wght400_GRAD0_opsz24.png" alt=""></a></div>
             <div x-show="user && user.role === 'admin'" class="stock-page"><a href="admin.html">Stock Update</a></div>
             <div x-show="!user">
-                <a href="#" @click="showLogin = true">Login</a>
-                <a href="#" @click="showSignup = true">Signup</a>
+                <a href="#" @click="showLogin = true"><img src="./images/login_FILL0_wght400_GRAD0_opsz24.png" alt=""></a>
+                <a href="#" @click="showSignup = true">sign up</a>
             </div>
             <div x-show="user">
-                <a href="#" @click="logoutUser">Logout</a>
+                <a href="#" @click="logoutUser"><img src="./images/logout_FILL0_wght400_GRAD0_opsz24.png" alt=""></a>
             </div>
+        </div>
         </nav>
     <div class="header">
+        <section id="catalogue-selection">
+            <div class="catalogue-selection">
+                <label for="chooseshoe">Find Shoes</label>
+                <select x-model="brand" id="brand" name="brand">
+                    <option value="">Brand</option>
+                    <option value="Nike">Nike</option>
+                    <option value="Adidas">Adidas</option>
+                    <option value="Puma">Puma</option>
+                    <option value="Reebok">Reebok</option>
+                    <option value="Steve-Madden">Steve Madden</option>
+                </select>
+    
+                <select x-model="size" id="size" name="size">
+                    <option value="">Size</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    
+                    <option value="9">9</option>
+                </select>
+    
+                <button @click="getShoesByBrandAndSize;  $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" class="sizeButton" type="submit">View</button>
+                <button @click="getAllShoes; $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" type="submit">All Shoes</button>
+    
+            </div>
+        </section>
+        <section id="login-modal" x-show="showLogin" x-cloak>
+            <div>
+                <form @submit.prevent="loginUser">
+                    <button class="closeBtn" type="button" @click="showLogin = false"></button>
+                    <label>Email:</label>
+                    <input type="email" x-model="loginForm.email" required>
+                    <label>Password:</label>
+                    <input type="password" x-model="loginForm.password" required>
+                    <button type="submit">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" @click="showSignup = true; showLogin = false">Create an account</a></p>
 
-    </div>
-
-    <section id="catalogue-selection">
-        <div class="catalogue-selection">
-            <label for="chooseshoe">Pick A Shoe</label>
-            <select x-model="brand" id="brand" name="brand">
-                <option value="">Select A Brand</option>
-                <option value="Nike">Nike</option>
-                <option value="Adidas">Adidas</option>
-                <option value="Puma">Puma</option>
-                <option value="Reebok">Reebok</option>
-                <option value="Steve-Madden">Steve Madden</option>
-                <option value="">Available</option>
-            </select>
-
-            <select x-model="size" id="size" name="size">
-                <option value="">Pick A Size</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
+            </div>
+        </section>
+        
+        <section id="signup-modal" x-show="showSignup" x-cloak>
+            <div>
+                <form @submit.prevent="signupUser">
+                    <button class="closeBtn" type="button" @click="showSignup = false"></button>
+                    <label>Username:</label>
+                    <input type="text" x-model="signupForm.username" required>
+                    <label>Email:</label>
+                    <input type="email" x-model="signupForm.email" required>
+                    <label>Password:</label>
+                    <input type="password" x-model="signupForm.password" required>
+                    <label>Balance:</label>
+                    <input type="text" x-model="signupForm.balance" required>
+                    <button type="submit">Signup</button>
+                </form>
+                <p>Already have an account? <a href="#" @click="showLogin = true; showSignup = false">Login</a></p>
                 
-                <option value="9">9</option>
-            </select>
-
-            <button @click="getShoesByBrandAndSize" class="sizeButton" type="submit">Show</button>
-
-        </div>
-    </section>
+            </div>
+        </section> 
+      
+    </div>
     <section id="shoe-list">
-        <div class="shoe-list">
+        <div class="shoe-list" x-ref="shoeCatalogue">
             <template x-for="shoe in shoes" :key="shoe.id">
                 <ul>
                     <div class="images">
                         <img x-bind:src="shoe.image_url" alt="Shoe Image">
-                        <button @click="addToCart({...shoe})">Add to Cart</button>
-                        <label for="quantity">Quantity:</label>
+                        <div class="addTo">
+                        <button @click="addToCart(shoe)">Add to Cart</button>
+                        <label for="quantity"><p>Quantity:</p></label>
                         <input type="number" id="quantity" name="quantity" x-model="shoe.quantity" min="1" max="10" />
                     </div>
+                </div>
                     <div class="details">
                         <li>Brand: <span x-text="shoe.brand"></span></li>
                         <li>Size: <span x-text="shoe.size"></span></li>
@@ -209,36 +259,14 @@
                     </div>
                 </ul>
             </template>
-            <div x-show="shoes.length === 0">No shoes available.</div>
+            <div x-show="shoes.length === 0">Find another shoe</div>
+            </div>
+            <div class="back-button">
+                <button @click="getAllShoes; $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })">Back</button>
+            </div>
         </div>
     </section>
-    <section id="login-modal" x-show="showLogin" x-cloak>
-        <div>
-            <form @submit.prevent="loginUser">
-                <label>Email:</label>
-                <input type="email" x-model="loginForm.email" required>
-                <label>Password:</label>
-                <input type="password" x-model="loginForm.password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </section>
-    <section id="signup-modal" x-show="showSignup" x-cloak>
-        <div>
-            <form @submit.prevent="signupUser">
-                <label>Username:</label>
-                <input type="text" x-model="signupForm.username" required>
-                <label>Email:</label>
-                <input type="email" x-model="signupForm.email" required>
-                <label>Password:</label>
-                <input type="password" x-model="signupForm.password" required>
-                <label>Balance:</label>
-                <input type="text" x-model="signupForm.balance" required>
-                <button type="submit">Signup</button>
-            </form>
-        </div>
-    </section>
-    
+  
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
 

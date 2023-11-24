@@ -1,0 +1,91 @@
+/*admin.html*/
+
+.add-content, .remove-content, .table-content{
+    width:100%;
+    height:100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.stock-table table {
+    width: 100%;
+    table-layout: fixed; 
+    margin-top: 5%;
+}
+
+.stock-table img {
+    width: 50px; 
+    height: auto;
+}
+ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  h6 {
+    margin: 0;
+    margin-right: 10px;
+  }
+  
+  .green-key, .orange-key, .red-key {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-left: auto;
+  }
+  
+  .green-key {
+    background-color: green;
+  }
+  
+  .orange-key {
+    background-color: orange;
+  }
+  
+  .red-key {
+    background-color: red;
+  }
+  
+.key{
+    position:absolute;
+    top: 10px;
+}
+.red{
+    background-color: red;
+}
+
+.red-key{
+    background-color: red;
+    
+}
+
+.orange{
+    background-color: orange;
+}
+
+.orange-key{
+    background-color: orange;
+
+}
+
+.green{
+    background-color: green;
+}
+.green-key{
+    background-color: green;
+}
+.remove{
+    margin-top: 2%;
+  }
+
+  .green-key, .red-key, .orange-key{
+            width: 10px;
+  }

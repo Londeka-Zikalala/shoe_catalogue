@@ -3,28 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./cart.css">
     <title>User Cart</title>
 </head>
 <body x-data="{
-    user: { email: '' },  
+    isLoading: true,
+    user: { email: localStorage.getItem('userEmail') || null},  
+    cart:{},
     cartItems: [],
     totalPrice: 0,
     messages: { checkout: { error: '', success: '' }},
     
-    getCart: async function() {
-        try {
-            const response = await axios.get(`https://lubabalos-shoe-shop.onrender.com/api/users/cart/${this.user.email}`);
-            this.cartItems = JSON.parse(JSON.stringify(Object.assign({}, response.data.cartItems || [])));
-            this.totalPrice = response.data.totalPrice;
-            this.messages.checkout.success = 'Checkout Successful!';
-            console.log('API Response:', this.cartItems);
-        } catch (error) {
-            this.messages.checkout.error = 'Error checking out';
-            console.error('API Error:', error);
+    getCart: function() {
+        // Check local storage for the user 
+        const storedUser = localStorage.getItem('user');
+        console.log(storedUser)
+        if (storedUser) {
+            this.user = JSON.parse(storedUser);
+            axios.get(`https://lubabalos-shoe-shop.onrender.com/api/users/cart/${this.user.email}`)
+                .then(response =>{
+                    this.cartItems = response.data.cart.cartItems;
+                    console.log(response.data); 
+                    this.totalPrice = response.data.cart.totalPrice;
+                    this.isLoading = false;
+                   
+                })   
+                .catch (error => {
+                    this.messages.checkout.error = 'Error checking out';
+                    console.error('API Error:', error);
+                })
         }
     },
+    
     checkout: function() {
-        axios.post(`https://lubabalos-shoe-shop.onrender.com/api/checkout/${this.user.email}`)
+        const storedUser = localStorage.getItem('user');
+        console.log(storedUser)
+        if(storedUser){
+            this.user = JSON.parse(storedUser)
+            axios.post(`https://lubabalos-shoe-shop.onrender.com/api/users/checkout/${this.user.email}`, {
+                email:this.user.email
+            })
             .then(response => {
                 this.checkoutMessage = response.data.message;
                 console.log('Checkout successful:', this.checkoutMessage);
@@ -32,8 +51,26 @@
             .catch(error => {
                 console.error('Error during checkout:', error);
             });
-    }
-}" x-init="getCart">
+        }
+        
+    },
+    logoutUser: function () {
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout')
+            .then(response => {
+                if (response.data.status === 'success') {
+                    // Clear user information from local storage
+                    localStorage.removeItem('user');
+                    this.user = null;
+                } else {
+                    alert('Error logging out. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error logging out:', error);
+                alert('Error logging out. Please try again.');
+            });
+    },
+}" x-init="user.email && getCart">
 
     <h1>Your Cart:</h1>
 
@@ -41,16 +78,17 @@
 
     <template x-if="cartItems.length > 0">
         <div class="cart">
-        <ul>
-            <li x-for="item in cartItems" :key="item.id">
-                <img :src="item.imgurl" alt="Shoe Image" width="50" height="50">
-                <span>Quantity: {{ item.quantity }}</span>
-                <span>Price: R{{ item.price }}</span>
-                <button @click="removeFromCart(item.id)">Remove</button>
-            </li>
+            <template x-for="item in cartItems" :key="item">
+                <li>
+                    <img :src="item.imgurl" alt="Shoe Image" width="50" height="50">
+                    Quantity: <span x-text="item.quantity"></span>
+                    Price: R <span x-text="item.price "></span>
+                    <!-- <button @click="removeFromCart($index)">Remove</button> -->
+                </li>
+            </template>
         </ul>
         <div class="checkout">
-            <p>Total Price: R{{ totalPrice }}</p>
+            <p>Total Price: <span x-text="totalPrice"></span></p>
             <button @click="checkout">Checkout</button>
             <div class="error-message" x-show="messages.checkout.error">
                 <h6>Error adding shoe Id:<span></span></h6>
