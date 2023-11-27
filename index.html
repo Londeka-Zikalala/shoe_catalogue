@@ -39,8 +39,7 @@
     },
     messages: { addToCart: { error: '', success: '' }},
     signupUser: function () {
-        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users', this.signupForm);
-            withCredentials: true
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users', this.signupForm)
             .then(response => {
                 if (response.data.status === 'success') {
                     this.user = {  email: this.signupForm.email };
@@ -55,8 +54,7 @@
             });
     },
     loginUser: function () {
-        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/login', this.loginForm);
-        withCredentials: true
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/login', this.loginForm)
             .then(response => {
                 if (response.data.status === 'success') {
                     this.user = { role: 'user', email: this.loginForm.email };
@@ -76,8 +74,7 @@
     },
        
     logoutUser: function () {
-        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout');
-        withCredentials: true
+        axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout')
             .then(response => {
                 if (response.data.status === 'success') {
                     // Clear user information from local storage
@@ -93,8 +90,7 @@
             });
     },
         getAllShoes: function() {
-            axios.get('https://lubabalos-shoe-shop.onrender.com/api/shoes');
-            withCredentials: true
+            axios.get('https://lubabalos-shoe-shop.onrender.com/api/shoes')
                 .then(response => {
                     if (response.data.data) {
                         this.shoes = response.data.data;
@@ -110,7 +106,6 @@
         getShoesByBrandAndSize: function() {
             if (this.brand && this.size) {
                 axios.get(`https://lubabalos-shoe-shop.onrender.com/api/shoes/brand/${this.brand}/size/${this.size}`)
-                    withCredentials: true
                     .then(response => {
                         if (response.data.data) {
                             this.shoes = response.data.data;
@@ -142,7 +137,6 @@
                     image_url: shoe.image_url,
                     quantity: shoe.quantity,
                 })
-                withCredentials: true
                 .then(response => {
                     console.log(this.user)
                     JSON.parse(JSON.stringify(Object.assign({}, response.data.shoe)))

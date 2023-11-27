@@ -15,7 +15,7 @@
     <title>kicks by lubabalo admin</title>
 </head>
 <body>
-    
+
 <nav>
     <a href="#add-shoe">Add A Shoe</a>
     <a href="#remove-shoe">Remove A Shoe</a>
@@ -34,7 +34,7 @@
     messages: { seeStock: { error: '', success: '' }},
     seeStock: function() {
         axios.get('https://lubabalos-shoe-shop.onrender.com/api/admin/stock')
-        withCredentials: true
+        
             .then(response => {
                 this.shoes = response.data.data;
             })
@@ -108,7 +108,7 @@
             in_stock: this.inStock,
             image_url: this.imageURL
         })
-    withCredentials: true
+    
         .then(response => {
             this.messages.addShoe.success = 'Shoe added successfully';
           
@@ -152,7 +152,7 @@
             quantity: this.quantity
 
         })
-        withCredentials: true
+        
             .then(response => {
                 this.messages.removeShoe.success = 'Shoe removed successfully';
             })
