@@ -198,10 +198,11 @@
                     <option value="9">9</option>
                 </select>
     
-                <button @click="getShoesByBrandAndSize;  $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" class="sizeButton" type="submit">View</button>
-                <button @click="getAllShoes; $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" type="submit">All Shoes</button>
+                <button class="filterBtn" @click="getShoesByBrandAndSize;  $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" class="sizeButton" type="submit">View</button>
     
             </div>
+            <button class="allBtn" @click="getAllShoes; $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })" type="submit">All Shoes</button>
+
         </section>
         <section id="login-modal" x-show="showLogin" x-cloak>
             <div>
@@ -211,7 +212,7 @@
                     <input type="email" x-model="loginForm.email" required>
                     <label>Password:</label>
                     <input type="password" x-model="loginForm.password" required>
-                    <button type="submit">Login</button>
+                    <button class="loginBtn" type="submit">Login</button>
                 </form>
                 <p>Don't have an account? <a href="#" @click="showSignup = true; showLogin = false">Create an account</a></p>
 
@@ -230,7 +231,7 @@
                     <input type="password" x-model="signupForm.password" required>
                     <label>Balance:</label>
                     <input type="text" x-model="signupForm.balance" required>
-                    <button type="submit">Signup</button>
+                    <button class="signUpBtn" type="submit">Signup</button>
                 </form>
                 <p>Already have an account? <a href="#" @click="showLogin = true; showSignup = false">Login</a></p>
                 
@@ -244,30 +245,34 @@
                 <ul>
                     <div class="images">
                         <img x-bind:src="shoe.image_url" alt="Shoe Image">
-                        <div class="addTo">
-                        <button @click="addToCart(shoe)">Add to Cart</button>
-                        <label for="quantity"><p>Quantity:</p></label>
-                        <input type="number" id="quantity" name="quantity" x-model="shoe.quantity" min="1" max="10" />
-                    </div>
+                        <div class="details">
+                            <li>Brand: <span x-text="shoe.brand"></span></li>
+                            <li>Size: <span x-text="shoe.size"></span></li>
+                            <li>Color: <span x-text="shoe.color"></span></li>
+                            <li>Price: R<span x-text="shoe.price"></span></li>
+                            <li>In Stock: <span x-text="shoe.in_stock"></span></li>
+                        </div>
                 </div>
-                    <div class="details">
-                        <li>Brand: <span x-text="shoe.brand"></span></li>
-                        <li>Size: <span x-text="shoe.size"></span></li>
-                        <li>Color: <span x-text="shoe.color"></span></li>
-                        <li>Price: R<span x-text="shoe.price"></span></li>
-                        <li>In Stock: <span x-text="shoe.in_stock"></span></li>
+                  
+                    <div class="addTo">
+                        <div>
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" name="quantity" x-model="shoe.quantity" min="1" max="10" />
+                        </div>
+                        <button class="addToCartBtn" @click="addToCart(shoe)">Add</button>
+                     
                     </div>
                 </ul>
             </template>
             <div x-show="shoes.length === 0">Find another shoe</div>
             </div>
-            <div class="back-button">
+            <div class="backBtn">
                 <button @click="getAllShoes; $refs.shoeCatalogue.scrollIntoView({ behavior: 'smooth' })">Back</button>
             </div>
         </div>
     </section>
   
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@0.26.1/dist/axios.min.js"></script>
 
 </body>
