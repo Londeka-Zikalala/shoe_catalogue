@@ -26,6 +26,7 @@
         if (storedUser) {
             this.user = JSON.parse(storedUser);
             axios.get(`https://lubabalos-shoe-shop.onrender.com/api/users/cart/${this.user.email}`)
+                withCredentials: true
                 .then(response =>{
                     this.cartItems = response.data.cart.cartItems;
                     console.log(response.data); 
@@ -48,6 +49,7 @@
             axios.post(`https://lubabalos-shoe-shop.onrender.com/api/users/checkout/${this.user.email}`, {
                 email:this.user.email
             })
+            withCredentials: true
             .then(response => {
                 this.checkoutMessage = response.data.message;
                 console.log('Checkout successful:', this.checkoutMessage);
@@ -60,6 +62,7 @@
     },
     logoutUser: function () {
         axios.post('https://lubabalos-shoe-shop.onrender.com/api/users/logout')
+        withCredentials: true
             .then(response => {
                 if (response.data.status === 'success') {
                     // Clear user information from local storage
